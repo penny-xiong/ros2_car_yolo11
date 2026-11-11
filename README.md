@@ -25,7 +25,7 @@ Gazebo Sim thermal sensor or real registered RGB/thermal data.
 - Ubuntu 22.04
 - ROS 2 Humble
 - Gazebo Classic 11
-- Python environment containing this modified Ultralytics repository
+- Python environment with the bundled modified Ultralytics package installed
 - The bundled RGB+IR YOLO-SIAF checkpoint (`weights/best.pt`)
 
 Install ROS dependencies:
@@ -49,7 +49,20 @@ database is required at launch. The local model library contains:
 The pedestrian animation is attributed in
 `models/pedestrian_actor/ATTRIBUTION.md` and is licensed under CC BY 4.0.
 
-## Build
+## Install the bundled YOLO-SIAF runtime
+
+From the repository root, install the included modified Ultralytics package:
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 -m pip install -e .
+```
+
+The bundled runtime contains the custom `SPDConv`, `SIAF_EA` (AIFM) and
+`C3_LTC` (C3k2-CAL) implementations required to deserialize and run the
+checkpoint. Do not replace it with an unmodified PyPI Ultralytics package.
+
+## Build the ROS 2 package
 
 ```bash
 mkdir -p ~/yolo_siaf_ros2_ws/src
@@ -59,12 +72,6 @@ source /opt/ros/humble/setup.bash
 rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
-```
-
-Make the modified Ultralytics package importable before launch:
-
-```bash
-export PYTHONPATH=/absolute/path/to/YOLOv11-RGBT-master:$PYTHONPATH
 ```
 
 ## Run

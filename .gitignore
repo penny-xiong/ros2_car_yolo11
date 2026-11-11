@@ -1,6 +1,10 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.venv/
+venv/
+*.egg-info/
+dist/
 build/
 install/
 log/
@@ -10,5 +14,6 @@ log/
 *.onnx
 *.engine
 !yolo_siaf_sim/weights/best.pt
+release/*.zip
 .vscode/
 .idea/
