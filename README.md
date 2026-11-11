@@ -66,7 +66,7 @@ checkpoint. Do not replace it with an unmodified PyPI Ultralytics package.
 
 ```bash
 mkdir -p ~/yolo_siaf_ros2_ws/src
-cp -r ros2_yolo_siaf_sim/yolo_siaf_sim ~/yolo_siaf_ros2_ws/src/
+cp -r yolo_siaf_sim ~/yolo_siaf_ros2_ws/src/
 cd ~/yolo_siaf_ros2_ws
 source /opt/ros/humble/setup.bash
 rosdep install --from-paths src --ignore-src -r -y
@@ -123,4 +123,170 @@ These values are simulation parameters rather than a certified braking policy.
    evaluating range error, but do not feed it to the controller.
 4. Record detection latency, range error, minimum clearance and stopping time.
    A successful visual demonstration alone is not a quantitative validation.
+
+## 中文运行指令（带注释）
+
+以下指令适用于 Ubuntu 22.04、ROS 2 Humble 和 Gazebo Classic 11。所有
+命令均在终端中执行，`#` 后面的内容是说明，不需要单独输入。
+
+### 1. 下载项目
+
+```bash
+# 克隆GitHub仓库
+git clone https://github.com/penny-xiong/ros2_car_yolo11.git
+
+# 进入仓库根目录
+cd ros2_car_yolo11
+```
+
+### 2. 安装ROS 2与Gazebo依赖
+
+```bash
+# 加载ROS 2 Humble环境
+source /opt/ros/humble/setup.bash
+
+# 更新软件包索引
+sudo apt update
+
+# 安装Gazebo接口、图像转换、消息同步和ROS 2编译工具
+sudo apt install -y ros-humble-gazebo-ros-pkgs \
+  ros-humble-xacro \
+  ros-humble-robot-state-publisher \
+  ros-humble-cv-bridge \
+  ros-humble-message-filters \
+  ros-humble-image-transport \
+  python3-colcon-common-extensions \
+  python3-rosdep \
+  python3-venv
+```
+
+### 3. 安装YOLO-SIAF运行环境
+
+```bash
+# 在仓库根目录创建虚拟环境；保留系统ROS 2 Python包的访问能力
+python3 -m venv --system-site-packages .venv
+
+# 激活虚拟环境
+source .venv/bin/activate
+
+# 更新pip并安装项目依赖
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+
+# 以可编辑方式安装仓库内修改后的Ultralytics
+python3 -m pip install -e .
+```
+
+不要用普通PyPI版Ultralytics覆盖本项目代码，否则模型可能无法找到
+`SPDConv`、`SIAF_EA` 和 `C3_LTC` 等自定义模块。
+
+### 4. 创建并编译ROS 2工作空间
+
+```bash
+# 创建ROS 2工作空间
+mkdir -p ~/yolo_siaf_ros2_ws/src
+
+# 将功能包复制到工作空间；该命令在仓库根目录执行
+cp -r yolo_siaf_sim ~/yolo_siaf_ros2_ws/src/
+
+# 进入工作空间
+cd ~/yolo_siaf_ros2_ws
+
+# 加载ROS 2环境
+source /opt/ros/humble/setup.bash
+
+# 安装package.xml中声明的依赖
+rosdep install --from-paths src --ignore-src -r -y
+
+# 编译功能包
+colcon build --symlink-install
+
+# 加载本次编译结果
+source install/setup.bash
+```
+
+### 5. 启动完整仿真
+
+```bash
+# 如果打开了新终端，先依次加载Python、ROS 2和工作空间环境
+source ~/ros2_car_yolo11/.venv/bin/activate
+source /opt/ros/humble/setup.bash
+source ~/yolo_siaf_ros2_ws/install/setup.bash
+
+# 启动夜间场景、小车、双相机、YOLO-SIAF和速度控制节点
+ros2 launch yolo_siaf_sim simulation.launch.py
+```
+
+启动文件默认使用功能包内的 `weights/best.pt`。若需要测试其他权重：
+
+```bash
+# 用指定的模型权重替换默认权重
+ros2 launch yolo_siaf_sim simulation.launch.py \
+  model_path:=/absolute/path/to/best.pt
+```
+
+### 6. 检查传感器与检测结果
+
+另开一个终端，并加载ROS 2工作空间：
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/yolo_siaf_ros2_ws/install/setup.bash
+
+# 查看当前ROS 2话题是否正常发布
+ros2 topic list
+
+# 查看RGB相机图像
+rqt_image_view /sensors/rgb/image_raw
+
+# 查看IR代理相机图像
+rqt_image_view /sensors/ir/image_raw
+
+# 查看带检测框、置信度和距离的结果图
+rqt_image_view /yolo_siaf/annotated_image
+
+# 查看最近行人的估算距离，单位为米
+ros2 topic echo /yolo_siaf/nearest_pedestrian_distance
+
+# 查看结构化检测记录
+ros2 topic echo /yolo_siaf/detections
+
+# 查看发送给小车的速度指令
+ros2 topic echo /cmd_vel
+```
+
+### 7. 停止与重新运行
+
+```bash
+# 在启动仿真的终端中按Ctrl+C，停止全部节点
+
+# 修改源码或参数后，在工作空间中重新编译
+cd ~/yolo_siaf_ros2_ws
+colcon build --symlink-install
+source install/setup.bash
+
+# 再次启动仿真
+ros2 launch yolo_siaf_sim simulation.launch.py
+```
+
+### 8. 常见检查
+
+```bash
+# 确认ROS 2能够找到功能包
+ros2 pkg prefix yolo_siaf_sim
+
+# 确认GPU和驱动状态
+nvidia-smi
+
+# 确认PyTorch能够访问CUDA
+python3 -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+
+# 确认加载的是仓库内的Ultralytics代码
+python3 -c "import ultralytics; print(ultralytics.__file__)"
+```
+
+Gazebo Classic中的IR图像是与RGB相机同位置的灰度代理图像，不包含真实
+热辐射信息。该配置用于验证双路同步、六通道推理和车辆减速闭环；真实
+热红外部署时，应将 `/sensors/ir/image_raw` 替换为完成标定和配准的热成像
+相机话题。
 
