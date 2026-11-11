@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="pedestrian_actor_preview">
+    <static>true</static>
+    <link name="preview_link">
+      <visual name="torso"><pose>0 0 1.15 0 0 0</pose><geometry><box><size>0.42 0.25 0.65</size></box></geometry><material><ambient>0.08 0.22 0.08 1</ambient><diffuse>0.12 0.45 0.12 1</diffuse></material></visual>
+      <visual name="head"><pose>0 0 1.62 0 0 0</pose><geometry><sphere><radius>0.14</radius></sphere></geometry><material><ambient>0.4 0.25 0.18 1</ambient><diffuse>0.65 0.42 0.30 1</diffuse></material></visual>
+      <visual name="left_leg"><pose>0 0.12 0.48 0 0 0</pose><geometry><cylinder><radius>0.08</radius><length>0.75</length></cylinder></geometry><material><ambient>0.04 0.04 0.08 1</ambient><diffuse>0.08 0.08 0.20 1</diffuse></material></visual>
+      <visual name="right_leg"><pose>0 -0.12 0.48 0 0 0</pose><geometry><cylinder><radius>0.08</radius><length>0.75</length></cylinder></geometry><material><ambient>0.04 0.04 0.08 1</ambient><diffuse>0.08 0.08 0.20 1</diffuse></material></visual>
+    </link>
+  </model>
+</sdf>

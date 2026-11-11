@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+build/
+install/
+log/
+*.bag
+*.db3
+*.pt
+*.onnx
+*.engine
+.vscode/
+.idea/

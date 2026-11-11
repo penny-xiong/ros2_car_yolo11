@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="night_road">
+    <static>true</static>
+    <link name="road_link">
+      <collision name="road_collision"><pose>0 0 -0.05 0 0 0</pose><geometry><box><size>120 10 0.10</size></box></geometry></collision>
+      <visual name="asphalt"><pose>0 0 -0.05 0 0 0</pose><geometry><box><size>120 10 0.10</size></box></geometry>
+        <material><ambient>0.025 0.025 0.03 1</ambient><diffuse>0.045 0.045 0.05 1</diffuse><specular>0.01 0.01 0.01 1</specular></material>
+      </visual>
+      <visual name="center_line"><pose>0 0 0.011 0 0 0</pose><geometry><box><size>116 0.08 0.015</size></box></geometry>
+        <material><ambient>0.75 0.68 0.12 1</ambient><diffuse>0.95 0.86 0.18 1</diffuse></material>
+      </visual>
+      <visual name="left_edge"><pose>0 4.4 0.012 0 0 0</pose><geometry><box><size>116 0.12 0.018</size></box></geometry>
+        <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+      </visual>
+      <visual name="right_edge"><pose>0 -4.4 0.012 0 0 0</pose><geometry><box><size>116 0.12 0.018</size></box></geometry>
+        <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+      </visual>
+      <collision name="left_sidewalk_collision"><pose>0 5.4 0.08 0 0 0</pose><geometry><box><size>120 1.8 0.16</size></box></geometry></collision>
+      <visual name="left_sidewalk"><pose>0 5.4 0.08 0 0 0</pose><geometry><box><size>120 1.8 0.16</size></box></geometry><material><ambient>0.15 0.15 0.16 1</ambient><diffuse>0.22 0.22 0.23 1</diffuse></material></visual>
+      <collision name="right_sidewalk_collision"><pose>0 -5.4 0.08 0 0 0</pose><geometry><box><size>120 1.8 0.16</size></box></geometry></collision>
+      <visual name="right_sidewalk"><pose>0 -5.4 0.08 0 0 0</pose><geometry><box><size>120 1.8 0.16</size></box></geometry><material><ambient>0.15 0.15 0.16 1</ambient><diffuse>0.22 0.22 0.23 1</diffuse></material></visual>
+    </link>
+  </model>
+</sdf>

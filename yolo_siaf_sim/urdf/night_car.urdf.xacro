@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="yolo_siaf_car">
+  <xacro:property name="pi" value="3.141592653589793"/>
+  <xacro:property name="wheel_radius" value="0.16"/>
+  <xacro:property name="wheel_width" value="0.08"/>
+  <xacro:property name="wheel_separation" value="0.72"/>
+
+  <material name="body_blue"><color rgba="0.05 0.18 0.45 1"/></material>
+  <material name="black"><color rgba="0.03 0.03 0.03 1"/></material>
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.24"/>
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0.08"/>
+      <mass value="30.0"/>
+      <inertia ixx="1.6" ixy="0" ixz="0" iyy="3.2" iyz="0" izz="3.8"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.08"/>
+      <geometry><box size="1.10 0.70 0.28"/></geometry>
+      <material name="body_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.08"/>
+      <geometry><box size="1.10 0.70 0.28"/></geometry>
+    </collision>
+  </link>
+
+  <xacro:macro name="drive_wheel" params="side y">
+    <link name="${side}_wheel_link">
+      <inertial>
+        <mass value="1.2"/>
+        <inertia ixx="0.009" ixy="0" ixz="0" iyy="0.016" iyz="0" izz="0.009"/>
+      </inertial>
+      <visual>
+        <origin rpy="${pi/2} 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin rpy="${pi/2} 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      </collision>
+    </link>
+    <joint name="${side}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${side}_wheel_link"/>
+      <origin xyz="0 ${y} -0.08"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="40" velocity="30"/>
+      <dynamics damping="0.05" friction="0.02"/>
+    </joint>
+  </xacro:macro>
+  <xacro:drive_wheel side="left" y="${wheel_separation/2}"/>
+  <xacro:drive_wheel side="right" y="${-wheel_separation/2}"/>
+
+  <link name="rear_caster_link">
+    <inertial><mass value="0.2"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
+    <visual><geometry><sphere radius="0.07"/></geometry><material name="black"/></visual>
+    <collision><geometry><sphere radius="0.07"/></geometry></collision>
+  </link>
+  <joint name="rear_caster_joint" type="fixed">
+    <parent link="base_link"/><child link="rear_caster_link"/>
+    <origin xyz="-0.43 0 -0.17"/>
+  </joint>
+
+  <!-- Both optical sensors are co-located to provide registered pixels. -->
+  <link name="rgb_camera_link">
+    <inertial><mass value="0.1"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
+    <visual><geometry><box size="0.10 0.16 0.10"/></geometry><material name="black"/></visual>
+  </link>
+  <joint name="rgb_camera_joint" type="fixed">
+    <parent link="base_link"/><child link="rgb_camera_link"/>
+    <origin xyz="0.42 0 1.16" rpy="0 0 0"/>
+  </joint>
+
+  <link name="ir_camera_link">
+    <inertial><mass value="0.1"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
+  </link>
+  <joint name="ir_camera_joint" type="fixed">
+    <parent link="rgb_camera_link"/><child link="ir_camera_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="left_wheel_link"><mu1>1.2</mu1><mu2>1.2</mu2></gazebo>
+  <gazebo reference="right_wheel_link"><mu1>1.2</mu1><mu2>1.2</mu2></gazebo>
+  <gazebo reference="base_link"><material>Gazebo/Blue</material></gazebo>
+
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros><namespace>/</namespace></ros>
+      <update_rate>50</update_rate>
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_separation}</wheel_separation>
+      <wheel_diameter>${2*wheel_radius}</wheel_diameter>
+      <max_wheel_torque>40</max_wheel_torque>
+      <max_wheel_acceleration>4.0</max_wheel_acceleration>
+      <command_topic>cmd_vel</command_topic>
+      <odometry_topic>odom</odometry_topic>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="rgb_camera_link">
+    <sensor name="rgb_camera" type="camera">
+      <always_on>true</always_on><update_rate>20</update_rate>
+      <camera>
+        <horizontal_fov>1.0471976</horizontal_fov>
+        <image><width>640</width><height>480</height><format>R8G8B8</format></image>
+        <clip><near>0.10</near><far>100.0</far></clip>
+        <noise><type>gaussian</type><mean>0.0</mean><stddev>0.008</stddev></noise>
+      </camera>
+      <plugin name="rgb_camera_plugin" filename="libgazebo_ros_camera.so">
+        <ros><namespace>/sensors/rgb</namespace></ros>
+        <camera_name>rgb</camera_name>
+        <frame_name>rgb_camera_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="ir_camera_link">
+    <sensor name="ir_proxy_camera" type="camera">
+      <always_on>true</always_on><update_rate>20</update_rate>
+      <camera>
+        <horizontal_fov>1.0471976</horizontal_fov>
+        <image><width>640</width><height>480</height><format>L8</format></image>
+        <clip><near>0.10</near><far>100.0</far></clip>
+        <noise><type>gaussian</type><mean>0.0</mean><stddev>0.004</stddev></noise>
+      </camera>
+      <plugin name="ir_camera_plugin" filename="libgazebo_ros_camera.so">
+        <ros><namespace>/sensors/ir</namespace></ros>
+        <camera_name>ir</camera_name>
+        <frame_name>ir_camera_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>

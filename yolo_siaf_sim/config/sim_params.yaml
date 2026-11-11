@@ -1,0 +1,27 @@
+yolo_siaf_detector:
+  ros__parameters:
+    rgb_topic: /sensors/rgb/image_raw
+    ir_topic: /sensors/ir/image_raw
+    camera_info_topic: /sensors/rgb/camera_info
+    model_path: ""
+    device: "0"
+    image_size: 640
+    confidence_threshold: 0.25
+    iou_threshold: 0.65
+    person_class_id: 0
+    nominal_person_height_m: 1.70
+    sync_slop_s: 0.08
+    max_inference_rate_hz: 15.0
+
+pedestrian_speed_controller:
+  ros__parameters:
+    distance_topic: /yolo_siaf/nearest_pedestrian_distance
+    cmd_vel_topic: /cmd_vel
+    cruise_speed_mps: 1.50
+    crawl_speed_mps: 0.15
+    slow_distance_m: 30.0
+    stop_distance_m: 5.0
+    max_acceleration_mps2: 0.60
+    max_deceleration_mps2: 1.50
+    detection_timeout_s: 0.50
+    control_rate_hz: 20.0

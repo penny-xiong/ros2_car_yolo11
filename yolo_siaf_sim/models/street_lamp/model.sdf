@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="street_lamp">
+    <static>true</static>
+    <link name="lamp_link">
+      <collision name="pole_collision"><pose>0 0 2.5 0 0 0</pose><geometry><cylinder><radius>0.07</radius><length>5.0</length></cylinder></geometry></collision>
+      <visual name="pole"><pose>0 0 2.5 0 0 0</pose><geometry><cylinder><radius>0.07</radius><length>5.0</length></cylinder></geometry><material><ambient>0.08 0.08 0.09 1</ambient><diffuse>0.16 0.16 0.18 1</diffuse></material></visual>
+      <visual name="arm"><pose>0 -0.45 4.85 0 1.5708 0</pose><geometry><cylinder><radius>0.045</radius><length>0.9</length></cylinder></geometry><material><ambient>0.08 0.08 0.09 1</ambient><diffuse>0.16 0.16 0.18 1</diffuse></material></visual>
+      <visual name="luminaire"><pose>0 -0.88 4.82 0 0 0</pose><geometry><box><size>0.32 0.48 0.12</size></box></geometry><material><emissive>0.8 0.72 0.42 1</emissive><diffuse>0.5 0.45 0.25 1</diffuse></material></visual>
+      <light name="street_light" type="point">
+        <pose>0 -0.88 4.65 0 0 0</pose><diffuse>0.72 0.64 0.42 1</diffuse><specular>0.15 0.14 0.10 1</specular>
+        <attenuation><range>22</range><constant>0.8</constant><linear>0.08</linear><quadratic>0.02</quadratic></attenuation><cast_shadows>true</cast_shadows>
+      </light>
+    </link>
+  </model>
+</sdf>
