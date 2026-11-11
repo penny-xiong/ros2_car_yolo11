@@ -9,5 +9,6 @@ log/
 *.pt
 *.onnx
 *.engine
+!yolo_siaf_sim/weights/best.pt
 .vscode/
 .idea/

@@ -26,6 +26,7 @@ setup(
         ("share/" + package_name + "/urdf", glob("urdf/*")),
         ("share/" + package_name + "/worlds", glob("worlds/*")),
         ("share/" + package_name + "/config", glob("config/*")),
+        ("share/" + package_name + "/weights", glob("weights/*.pt")),
     ] + model_data_files(),
     install_requires=["setuptools"],
     zip_safe=True,

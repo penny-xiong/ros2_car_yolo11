@@ -15,6 +15,7 @@ def generate_launch_description():
     models_dir = os.path.join(package_share, "models")
     car_sdf = os.path.join(models_dir, "yolo_siaf_car", "model.sdf")
     params_file = os.path.join(package_share, "config", "sim_params.yaml")
+    default_model_path = os.path.join(package_share, "weights", "best.pt")
 
     model_path = LaunchConfiguration("model_path")
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -23,6 +24,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "model_path",
+                default_value=default_model_path,
                 description="Absolute path to the trained YOLO-SIAF best.pt checkpoint",
             ),
             DeclareLaunchArgument("use_sim_time", default_value="true"),

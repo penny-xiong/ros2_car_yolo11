@@ -26,7 +26,7 @@ Gazebo Sim thermal sensor or real registered RGB/thermal data.
 - ROS 2 Humble
 - Gazebo Classic 11
 - Python environment containing this modified Ultralytics repository
-- A trained YOLO-SIAF checkpoint (`best.pt`)
+- The bundled RGB+IR YOLO-SIAF checkpoint (`weights/best.pt`)
 
 Install ROS dependencies:
 
@@ -70,9 +70,15 @@ export PYTHONPATH=/absolute/path/to/YOLOv11-RGBT-master:$PYTHONPATH
 ## Run
 
 ```bash
-ros2 launch yolo_siaf_sim simulation.launch.py \
-  model_path:=/absolute/path/to/best.pt
+ros2 launch yolo_siaf_sim simulation.launch.py
 ```
+
+The launch file uses the bundled checkpoint by default. To test another
+checkpoint, override it with `model_path:=/absolute/path/to/best.pt`.
+
+The bundled checkpoint comes from `runs/detect/yolo11-GC10`, trained directly
+with the complete `yolo11-6.yaml` RGB+IR architecture. Its highest recorded
+LLVIP validation results are mAP50 = 0.97124 and mAP50-95 = 0.66280.
 
 Important topics:
 
